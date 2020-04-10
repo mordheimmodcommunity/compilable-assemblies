@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+# Exit on error
+# exit when any command fails
+set -e
+set -o pipefail
+
+# keep track of the last executed command
+trap 'last_command=$current_command; current_command=$BASH_COMMAND' DEBUG
+# echo an error message before exiting
+trap 'echo "\"${last_command}\" command filed with exit code $?."' ERR
+
+# - Actual script
+STAGED_FILES=`git diff --name-only --cached --diff-filter=d`
+echo "Staged files ${STAGED_FILES}"
+
+# Build edit string, by replacing newlines with semicolons.
+# --diff-filter=d only filters files that are not deleted, which means we won't have trouble adding them afterwards
+INCLUDE_STRING=`git diff --name-only --cached --diff-filter=d | sed ':a;N;$!ba;s/\n/,/g'`
+echo "Include string: $INCLUDE_STRING"
+
+# If the include string is empty, we're done. This happens e.g. if the commit only consists of deleted files.
+if [[ -z "$INCLUDE_STRING" ]]
+then
+    echo "No files to change"
+    exit 0
+fi
+
+# check for dotnet-format update
+function checkUpdate() {
+  version=`dotnet-format --version`
+  lastRelease="3.3.111304" # to be improved with auto check on github for latestRelease
+  [[ $version == $lastRelease* ]] && echo 'dotnet-format is up to date' || { echo 'New version of dotnet-format available'; echo 'Updating dotnet-format...'; dotnet tool update -g dotnet-format; }
+}
+
+echo "Checking for update..."
+checkUpdate
+
+# Edit your project files here
+echo "Formatting files..."
+dotnet-format -v diag --folder . --include $INCLUDE_STRING
+
+# Restage files
+echo "Restaging files: $STAGED_FILES"
+echo ${STAGED_FILES} | xargs -t -l git add
+
+echo "pre-commit hook finished"
