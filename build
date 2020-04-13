@@ -9,6 +9,6 @@ trap 'last_command=$current_command; current_command=$BASH_COMMAND' DEBUG
 # echo an error message before exiting
 trap 'echo "\"${last_command}\" command filed with exit code $?."' ERR
 
-msbuild=`find $WINDIR/Microsoft.NET/Framework/v3.5 -name "MSBuild.exe"`
+msbuild=`find $WINDIR/Microsoft.NET/Framework/v4.0.30319 -name "MSBuild.exe"`
 
 $msbuild Assembly-CSharp/Assembly-CSharp.csproj
