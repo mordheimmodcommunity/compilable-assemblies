@@ -1,4 +1,4 @@
-`Project has been abandonned for now, you can give it a go if you want to`
+:warning: `Project has been abandonned for now, you can give it a go if you want to` :warning:
 
 # WORK IN PROGRESS
 
