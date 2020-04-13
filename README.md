@@ -1,3 +1,5 @@
+`Project has been abandonned for now, you can give it a go if you want to`
+
 # WORK IN PROGRESS
 
 ## dependencies
